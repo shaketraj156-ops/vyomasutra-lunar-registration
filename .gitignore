@@ -1,0 +1,5 @@
+data/ 
+*.tif 
+outputs/ 
+__pycache__/ 
+venv/ 

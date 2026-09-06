@@ -1,0 +1,8 @@
+opencv-contrib-python
+numpy
+scikit-image
+streamlit
+pyyaml
+gdal
+rasterio
+torch

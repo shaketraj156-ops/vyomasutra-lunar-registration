@@ -1,0 +1,47 @@
+sensors:
+  ohrc:
+    full_name: "Orbiter High Resolution Camera"
+    pixel_size_m: 0.25
+    expected_format: "GeoTIFF"
+    reference_sensor: "lroc_nac"
+    preprocessing:
+      clahe_clip_limit: 2.0
+      clahe_tile_grid_size: [8, 8]
+
+  tmc2:
+    full_name: "Terrain Mapping Camera-2"
+    pixel_size_m: 5
+    expected_format: "GeoTIFF"
+    reference_sensor: "lroc_wac"
+    preprocessing:
+      clahe_clip_limit: 1.5
+      clahe_tile_grid_size: [8, 8]
+
+  iirs:
+    full_name: "Imaging Infrared Spectrometer"
+    pixel_size_m: 80
+    expected_format: "GeoTIFF"
+    reference_sensor: "lroc_wac"
+    preprocessing:
+      clahe_clip_limit: 1.0
+      clahe_tile_grid_size: [4, 4]
+
+  lroc_nac:
+    full_name: "LROC Narrow Angle Camera"
+    pixel_size_m: 0.5
+    expected_format: "GeoTIFF"
+    role: "reference"
+
+  lroc_wac:
+    full_name: "LROC Wide Angle Camera"
+    pixel_size_m: 100
+    expected_format: "GeoTIFF"
+    role: "reference"
+
+matching_pairs:
+  - source: "ohrc"
+    reference: "lroc_nac"
+  - source: "tmc2"
+    reference: "lroc_wac"
+  - source: "iirs"
+    reference: "lroc_wac"
