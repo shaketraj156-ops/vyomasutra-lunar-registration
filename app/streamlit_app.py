@@ -100,18 +100,30 @@ if run_button:
                     m2.metric("Inlier Ratio", f"{inlier_ratio:.2%}")
                     m3.metric("SSIM Score", f"{ssim_score:.4f}")
 
-                    # --- Download button ---
+                                        # --- Download button: real GeoTIFF ---
+                    from transform import export_geotiff
+
                     output_path = "outputs/geotiff/aligned_output.tif"
                     os.makedirs("outputs/geotiff", exist_ok=True)
-                    cv2.imwrite(output_path.replace(".tif", ".png"), warped)  # PNG for now, real GeoTIFF once transform.py finalized
 
-                    with open(output_path.replace(".tif", ".png"), "rb") as f:
-                        st.download_button(
-                            label="⬇️ Download Aligned Result",
-                            data=f,
-                            file_name="aligned_result.png",
-                            mime="image/png"
-                        )
+                    export_success = export_geotiff(
+                        warped, output_path,
+                        crs='EPSG:4326',
+                        origin_x=45.0,
+                        origin_y=-10.0,
+                        pixel_size=0.001
+                    )
+
+                    if export_success:
+                        with open(output_path, "rb") as f:
+                            st.download_button(
+                                label="⬇️ Download Aligned Result (GeoTIFF)",
+                                data=f,
+                                file_name="aligned_result.tif",
+                                mime="image/tiff"
+                            )
+                    else:
+                        st.warning("⚠️ GeoTIFF export failed — check console for details.")
 
             # Cleanup temp files
             os.remove("temp_source.tif")
