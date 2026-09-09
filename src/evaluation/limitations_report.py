@@ -66,7 +66,7 @@ def generate_limitations_report(image, matches, inlier_ratio, ssim_score,
             f"Low-texture zones detected ({texture_info['low_texture_ratio']:.1%} of image) — "
             "matching confidence may be reduced in flat/maria regions."
         )
-    if polar_info["warning"]:
+    if polar_info.get("warning"):
         warnings.append(
             f"Image is near a polar region (latitude {polar_info['latitude']}°) — "
             "extreme lighting conditions may reduce registration accuracy."
