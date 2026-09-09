@@ -5,6 +5,7 @@ into a single unified list, using the shared schema:
     List[(x1, y1, x2, y2, confidence)]
 """
 
+import os
 import rasterio
 from src.matching.classical_sift import match_sift
 from src.matching.deep_lightglue import match_images as lightglue_match_images
@@ -12,8 +13,21 @@ from src.matching.deep_lightglue import match_images as lightglue_match_images
 
 def load_image_array(path):
     """Rasterio se image ko numpy array mein load karo (SIFT ke liye chahiye)."""
-    with rasterio.open(path) as src:
-        return src.read(1)  # pehla band load karo (grayscale)
+    # ---- NAYA: file exist check, warna rasterio ka error message confusing hota hai ----
+    if not os.path.exists(path):
+        raise FileNotFoundError(f"Image file nahi mili: {path}")
+
+    try:
+        with rasterio.open(path) as src:
+            band1 = src.read(1)
+    except Exception as e:
+        # ---- NAYA: corrupt/unsupported file ko clear message ke saath re-raise karo ----
+        raise RuntimeError(f"'{path}' khulti nahi (corrupt ya unsupported format): {e}")
+
+    if band1.size == 0:
+        raise RuntimeError(f"'{path}' mein band 1 empty hai")
+
+    return band1
 
 
 def get_sift_matches(source_path, reference_path):
@@ -30,13 +44,28 @@ def get_sift_matches(source_path, reference_path):
 
 def get_lightglue_matches(source_path, reference_path):
     """LightGlue seedha file paths leta hai."""
+    # ---- NAYA: file existence yahan bhi check karo, LightGlue ka error kabhi unclear hota hai ----
+    if not os.path.exists(source_path):
+        raise FileNotFoundError(f"Source image nahi mili: {source_path}")
+    if not os.path.exists(reference_path):
+        raise FileNotFoundError(f"Reference image nahi mili: {reference_path}")
+
     matches = lightglue_match_images(source_path, reference_path)
     tagged = [(*m, "lightglue") for m in matches]
     return tagged
 
 
 def combine_matches(source_path, reference_path, run_sift=True, run_lightglue=True):
+    """
+    Returns:
+        List of tagged matches.
+    Raises:
+        RuntimeError — agar SIFT aur LightGlue dono fail ho gaye (pehle silently [] return hota tha,
+        jo downstream RANSAC ko confusing "0 matches" error deta tha without wajah bataye).
+    """
     combined = []
+    sift_error = None
+    lightglue_error = None
 
     if run_sift:
         try:
@@ -44,6 +73,7 @@ def combine_matches(source_path, reference_path, run_sift=True, run_lightglue=Tr
             print(f"SIFT: {len(sift_matches)} matches found")
             combined.extend(sift_matches)
         except Exception as e:
+            sift_error = e
             print(f"⚠️ SIFT matching failed: {e}")
 
     if run_lightglue:
@@ -52,7 +82,14 @@ def combine_matches(source_path, reference_path, run_sift=True, run_lightglue=Tr
             print(f"LightGlue: {len(lg_matches)} matches found")
             combined.extend(lg_matches)
         except Exception as e:
+            lightglue_error = e
             print(f"⚠️ LightGlue matching failed: {e}")
+
+    # ---- NAYA: agar dono matchers fail hue (ya dono skip the), clearly batao kyun ----
+    if run_sift and run_lightglue and sift_error is not None and lightglue_error is not None:
+        raise RuntimeError(
+            f"Dono matchers fail ho gaye — SIFT: {sift_error} | LightGlue: {lightglue_error}"
+        )
 
     print(f"Total combined matches: {len(combined)}")
     return combined
