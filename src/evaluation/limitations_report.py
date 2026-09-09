@@ -41,7 +41,7 @@ def flag_polar_region(latitude=None):
     lower-confidence flag karta hai — kyunki lighting extreme hoti hai wahan.
     """
     if latitude is None:
-        return {"is_polar": None, "note": "Latitude metadata not provided"}
+        return {"is_polar": None, "note": "Latitude metadata not provided", "warning": False}
     
     is_polar = bool(abs(latitude) > 75.0)
     return {

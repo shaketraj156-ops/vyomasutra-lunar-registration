@@ -18,6 +18,7 @@ from transform import warp_image
 from metrics import compute_inlier_ratio, compute_ssim
 from clahe import apply_clahe
 from limitations_report import generate_limitations_report
+from comparison_table import generate_comparison_table
 
 st.set_page_config(page_title="SIH26166 — Lunar Image Registration", layout="wide")
 
@@ -113,6 +114,35 @@ if run_button:
 
                     for warning in report['warnings']:
                         st.warning(warning)
+
+                    # --- Comparison Table vs Makharia et al. ---
+                    st.subheader("📊 Comparison vs Makharia et al. Baseline")
+
+                    our_results = {
+                        "test_type": "current run",
+                        "combined_matches": len(matches),
+                        "inliers_after_ransac": len(inliers),
+                        "inlier_ratio": inlier_ratio,
+                        "ssim_score": ssim_score,
+                    }
+
+                    comparison = generate_comparison_table(our_results)
+
+                    st.caption(f"Baseline paper: {comparison['baseline_paper']}")
+
+                    for dataset, algos in comparison['baseline_numbers'].items():
+                        with st.expander(f"📁 {dataset}"):
+                            for algo, vals in algos.items():
+                                st.write(f"**{algo}**: RMSE X={vals['rmse_x']}, RMSE Y={vals['rmse_y']}, Time={vals['time_s']}s")
+
+                    st.markdown("**Our Current Run:**")
+                    oc1, oc2, oc3 = st.columns(3)
+                    oc1.metric("Matches Used", our_results['combined_matches'])
+                    oc2.metric("Inliers", our_results['inliers_after_ransac'])
+                    oc3.metric("SSIM", f"{our_results['ssim_score']:.4f}")
+
+                    for note in comparison['notes']:
+                        st.caption(f"ℹ️ {note}")
 
                     # --- Download button: real GeoTIFF ---
                     from transform import export_geotiff
