@@ -17,6 +17,7 @@ from ransac import filter_ransac
 from transform import warp_image
 from metrics import compute_inlier_ratio, compute_ssim
 from clahe import apply_clahe
+from limitations_report import generate_limitations_report
 
 st.set_page_config(page_title="SIH26166 — Lunar Image Registration", layout="wide")
 
@@ -100,7 +101,20 @@ if run_button:
                     m2.metric("Inlier Ratio", f"{inlier_ratio:.2%}")
                     m3.metric("SSIM Score", f"{ssim_score:.4f}")
 
-                                        # --- Download button: real GeoTIFF ---
+                    # --- Limitations Report ---
+                    st.subheader("⚠️ Limitations Report")
+                    report = generate_limitations_report(
+                        img1_processed, matches, inlier_ratio, ssim_score,
+                        latitude=None  # real data aane pe actual latitude dena
+                    )
+
+                    confidence_color = {"HIGH": "🟢", "MODERATE": "🟡", "LOW": "🔴"}
+                    st.markdown(f"**Confidence Level:** {confidence_color.get(report['confidence_level'], '')} {report['confidence_level']}")
+
+                    for warning in report['warnings']:
+                        st.warning(warning)
+
+                    # --- Download button: real GeoTIFF ---
                     from transform import export_geotiff
 
                     output_path = "outputs/geotiff/aligned_output.tif"
