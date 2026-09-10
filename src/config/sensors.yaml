@@ -1,8 +1,36 @@
 # VyomaSutra sensor-pair configuration
-# Actual file paths are intentionally left empty until real datasets arrive.
+
+sensors:
+  OHRC:
+    full_name: "Orbiter High Resolution Camera"
+    pixel_size_m: 0.25
+    expected_format: "GeoTIFF"
+    preprocessing:
+      clahe_clip_limit: 2.0
+      clahe_tile_grid_size: [8, 8]
+
+  TMC:
+    full_name: "Terrain Mapping Camera-2"
+    pixel_size_m: 5
+    expected_format: "GeoTIFF"
+    preprocessing:
+      clahe_clip_limit: 1.5
+      clahe_tile_grid_size: [8, 8]
+
+  IIRS:
+    full_name: "Imaging Infrared Spectrometer"
+    pixel_size_m: 80
+    expected_format: "GeoTIFF"
+    preprocessing:
+      clahe_clip_limit: 1.0
+      clahe_tile_grid_size: [4, 4]
+
+  LROC:
+    full_name: "LROC Reference Imagery"
+    expected_format: "GeoTIFF"
+    role: "reference"
 
 pairs:
-
   OHRC_LROC:
     source_sensor: OHRC
     reference_sensor: LROC
