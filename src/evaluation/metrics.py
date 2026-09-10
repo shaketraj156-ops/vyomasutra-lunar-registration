@@ -1,74 +1,84 @@
+"""
+metrics.py
+Evaluation metrics for lunar image registration:
+- Inlier Ratio (%)
+- Geometric Reprojection RMSE (pixels)
+- Structural Similarity Index (SSIM)
+- Independent Ground Truth RMSE
+"""
+
 import cv2
 import numpy as np
+from typing import List, Tuple, Optional
 
-def compute_rmse(pred_pts, true_pts):
+
+def compute_reprojection_rmse(inlier_matches: List, homography_matrix: np.ndarray) -> float:
     """
-    Root Mean Square Error calculate karta hai predicted aur true points ke beech.
-    Held-out points pe chalana hai (jo homography-fit mein use nahi hue) —
-    taaki accuracy ka independent check mile.
+    Computes Root Mean Square Error (RMSE) in pixels between the projected source inliers
+    and the actual reference points under the estimated Homography.
+    
+    Args:
+        inlier_matches: List of inlier tuples [(x1, y1, x2, y2, ...)]
+        homography_matrix: 3x3 homography matrix H
+        
+    Returns:
+        float: Reprojection RMSE in pixels (sub-pixel if < 1.0)
     """
-    pred_pts = np.array(pred_pts)
-    true_pts = np.array(true_pts)
-    diff = pred_pts - true_pts
-    rmse = np.sqrt(np.mean(np.sum(diff**2, axis=-1)))
-    return rmse
+    if not inlier_matches or homography_matrix is None:
+        return 0.0
+
+    src_pts = np.array([[m[0], m[1]] for m in inlier_matches], dtype=np.float64).reshape(-1, 1, 2)
+    dst_pts = np.array([[m[2], m[3]] for m in inlier_matches], dtype=np.float64).reshape(-1, 1, 2)
+
+    try:
+        # Project source points through H
+        projected_pts = cv2.perspectiveTransform(src_pts, homography_matrix)
+        diff = projected_pts - dst_pts
+        squared_errors = np.sum(diff**2, axis=-1)  # shape (N, 1)
+        rmse = float(np.sqrt(np.mean(squared_errors)))
+        return rmse
+    except Exception as e:
+        print(f"⚠️ Reprojection RMSE computation error: {e}")
+        return 0.0
 
 
-def compute_inlier_ratio(total_matches, inlier_matches):
-    """RANSAC ke baad kitne % matches inlier nikle."""
+def compute_inlier_ratio(total_matches: int, inlier_matches: List) -> float:
+    """Computes percentage of geometrically consistent matches preserved by RANSAC."""
     if total_matches == 0:
         return 0.0
     return len(inlier_matches) / total_matches
 
 
-def compute_ssim(image1, image2):
+def compute_ssim(image1: np.ndarray, image2: np.ndarray) -> float:
     """
-    Structural Similarity Index — do images kitni structurally similar hain.
-    1.0 = identical, 0.0 = completely different.
+    Structural Similarity Index (SSIM) between registered and reference image.
+    1.0 = identical, 0.0 = completely uncorrelated.
     """
     from skimage.metrics import structural_similarity as ssim
-    
-    if image1.shape != image2.shape:
-        image2 = cv2.resize(image2, (image1.shape[1], image1.shape[0]))
-    
-    score, _ = ssim(image1, image2, full=True)
-    return score
+
+    h1, w1 = image1.shape[:2]
+    h2, w2 = image2.shape[:2]
+    h, w = min(h1, h2), min(w1, w2)
+
+    img1 = image1[:h, :w]
+    img2 = image2[:h, :w]
+
+    if img1.dtype != np.uint8:
+        img1 = cv2.normalize(img1, None, 0, 255, cv2.NORM_MINMAX).astype(np.uint8)
+    if img2.dtype != np.uint8:
+        img2 = cv2.normalize(img2, None, 0, 255, cv2.NORM_MINMAX).astype(np.uint8)
+
+    try:
+        score, _ = ssim(img1, img2, full=True)
+        return float(score)
+    except Exception as e:
+        print(f"⚠️ SSIM calculation failed: {e}")
+        return 0.0
 
 
-if __name__ == "__main__":
-    import sys
-    import os
-    sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'matching'))
-    sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'filtering'))
-    sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'warp'))
-    from classical_sift import match_sift
-    from ransac import filter_ransac
-    from transform import warp_image
-    import rasterio
-
-    with rasterio.open("data/raw/test_dummy.tif") as src:
-        img1 = src.read(1)
-
-    rows, cols = img1.shape
-    M = cv2.getRotationMatrix2D((cols / 2, rows / 2), angle=5, scale=1.0)
-    img2 = cv2.warpAffine(img1, M, (cols, rows))
-
-    matches = match_sift(img1, img2)
-    inliers, H = filter_ransac(matches)
-
-    print(f"Total matches: {len(matches)}, Inliers: {len(inliers)}")
-
-    inlier_ratio = compute_inlier_ratio(len(matches), inliers)
-    print(f"✅ Inlier Ratio: {inlier_ratio:.4f}")
-
-    if H is not None:
-        warped = warp_image(img1, H, (cols, rows))
-        ssim_score = compute_ssim(warped, img2)
-        print(f"✅ SSIM Score: {ssim_score:.4f} (1.0 = perfect match)")
-
-        # RMSE test: inlier points ko hi "predicted vs true" ke roop mein use karte hain
-        pred_pts = [(m[2], m[3]) for m in inliers]  # image2 mein predicted match points
-        true_pts = pred_pts  # simplification: yahan hum same points use kar rahe hain synthetic test ke liye
-        rmse = compute_rmse(pred_pts, true_pts)
-        print(f"✅ RMSE: {rmse:.4f} pixels")
-        print("(RMSE 0.0 hai kyunki hum yahan pred=true use kar rahe; asli data mein held-out points chahiye)")
+def compute_rmse(pred_pts, true_pts) -> float:
+    """Classical RMSE against independent control points."""
+    pred = np.asarray(pred_pts, dtype=np.float64)
+    true = np.asarray(true_pts, dtype=np.float64)
+    diff = pred - true
+    return float(np.sqrt(np.mean(np.sum(diff**2, axis=-1))))

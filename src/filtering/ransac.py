@@ -17,11 +17,12 @@ def filter_ransac(matches, ransac_thresh=3.0):
 
     H, mask = cv2.findHomography(src_pts, dst_pts, cv2.RANSAC, ransac_thresh)
 
-    if H is None:
-        print("⚠️  Homography compute nahi ho payi")
+    if H is None or mask is None:
+        print("[WARNING] Homography compute nahi ho payi")
         return [], None
 
-    inlier_matches = [m for i, m in enumerate(matches) if mask[i]]
+    mask_flat = mask.ravel()
+    inlier_matches = [m for i, m in enumerate(matches) if mask_flat[i] == 1]
 
     return inlier_matches, H
 

@@ -25,22 +25,25 @@ def weighted_distribution_score(matches, image_shape, grid=(8, 8)):
     
     # Har match kis grid-cell mein padta hai, wo track karo
     cells_hit = set()
-    for x1, y1, x2, y2, conf in matches:
-        # x1, y1 image1 ke coordinates hain — inhi ko grid mein map karte hain
-        cell_row = min(int(y1 // gh), grid[0] - 1)
-        cell_col = min(int(x1 // gw), grid[1] - 1)
+    conf_sum = 0.0
+    for m in matches:
+        x1, y1 = m[0], m[1]
+        conf = float(m[4]) if len(m) > 4 else 1.0
+        conf_sum += conf
+        cell_row = min(max(0, int(y1 // gh)), grid[0] - 1)
+        cell_col = min(max(0, int(x1 // gw)), grid[1] - 1)
         cells_hit.add((cell_row, cell_col))
     
     # Coverage: kitne % grid cells mein kam se kam ek match hai
     coverage = len(cells_hit) / (grid[0] * grid[1])
     
     # Average confidence saare matches ka
-    mean_conf = sum(conf for *_, conf in matches) / len(matches)
+    mean_conf = conf_sum / len(matches)
     
-    # Dono ko combine karo (weights baad mein tune kar sakte ho)
+    # Dono ko combine karo
     score = 0.5 * coverage + 0.5 * mean_conf
     
-    return score
+    return float(score)
 
 
 if __name__ == "__main__":
