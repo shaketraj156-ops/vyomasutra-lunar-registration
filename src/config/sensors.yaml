@@ -1,0 +1,22 @@
+# VyomaSutra sensor-pair configuration
+# Actual file paths are intentionally left empty until real datasets arrive.
+
+pairs:
+
+  OHRC_LROC:
+    source_sensor: OHRC
+    reference_sensor: LROC
+    source_path: null
+    reference_path: null
+
+  TMC_LROC:
+    source_sensor: TMC
+    reference_sensor: LROC
+    source_path: null
+    reference_path: null
+
+  IIRS_LROC:
+    source_sensor: IIRS
+    reference_sensor: LROC
+    source_path: null
+    reference_path: null
