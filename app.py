@@ -1090,329 +1090,330 @@ else:
     reference_name = "Reference Image"
 
     sample_dir = os.path.join(ROOT_DIR, "data", "samples")
-src_sample_path = os.path.join(sample_dir, "ch2_ohr_ncp_20220914T0835371412_g_grd_d32.tif")
-ref_sample_path = os.path.join(sample_dir, "ch2_ohr_ncp_20220914T1033119094_g_grd_d32.tif")
-if not (os.path.exists(src_sample_path) and os.path.exists(ref_sample_path)):
-    src_sample_path = os.path.join(sample_dir, "lunar_source_crater.tif")
-    ref_sample_path = os.path.join(sample_dir, "lunar_reference_crater.tif")
+    src_sample_path = os.path.join(sample_dir, "ch2_ohr_ncp_20220914T0835371412_g_grd_d32.tif")
+    ref_sample_path = os.path.join(sample_dir, "ch2_ohr_ncp_20220914T1033119094_g_grd_d32.tif")
+    if not (os.path.exists(src_sample_path) and os.path.exists(ref_sample_path)):
+        src_sample_path = os.path.join(sample_dir, "lunar_source_crater.tif")
+        ref_sample_path = os.path.join(sample_dir, "lunar_reference_crater.tif")
 
-if input_mode == "🎯 Preloaded Lunar Demo Pair (Instant Demo)":
-    if os.path.exists(src_sample_path) and os.path.exists(ref_sample_path):
-        with rasterio.open(src_sample_path) as s:
-            source_array = s.read(1)
-        with rasterio.open(ref_sample_path) as r:
-            reference_array = r.read(1)
-            ref_crs = r.crs
-            ref_transform = r.transform
-        source_name = "Chandrayaan-2 OHRC Strip 1 (ch2_ohr_ncp_20220914T0835371412)"
-        reference_name = "Chandrayaan-2 OHRC Strip 2 (ch2_ohr_ncp_20220914T1033119094)"
-        st.markdown("""
-        <style>
-        .neon-demo-banner {
-            background-color: rgba(20, 30, 50, 0.7);
-            border: 1.5px solid #00A3FF;
-            border-radius: 10px;
-            padding: 16px 22px;
-            margin-top: 15px;
-            margin-bottom: 25px;
-            color: #F8FAFC;
-            font-family: 'Segoe UI', Roboto, sans-serif;
-            font-size: 1.1rem;
-            line-height: 1.5;
-            backdrop-filter: blur(14px);
-            -webkit-backdrop-filter: blur(14px);
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.8), 0 0 10px rgba(0, 163, 255, 0.25);
-            transition: all 0.3s ease-in-out;
-            display: flex;
-            align-items: center;
-            gap: 14px;
-        }
+    if input_mode == "🎯 Preloaded Lunar Demo Pair (Instant Demo)":
+        if os.path.exists(src_sample_path) and os.path.exists(ref_sample_path):
+            with rasterio.open(src_sample_path) as s:
+                source_array = s.read(1)
+            with rasterio.open(ref_sample_path) as r:
+                reference_array = r.read(1)
+                ref_crs = r.crs
+                ref_transform = r.transform
+            source_name = "Chandrayaan-2 OHRC Strip 1 (ch2_ohr_ncp_20220914T0835371412)"
+            reference_name = "Chandrayaan-2 OHRC Strip 2 (ch2_ohr_ncp_20220914T1033119094)"
+            st.markdown("""
+            <style>
+            .neon-demo-banner {
+                background-color: rgba(20, 30, 50, 0.7);
+                border: 1.5px solid #00A3FF;
+                border-radius: 10px;
+                padding: 16px 22px;
+                margin-top: 15px;
+                margin-bottom: 25px;
+                color: #F8FAFC;
+                font-family: 'Segoe UI', Roboto, sans-serif;
+                font-size: 1.1rem;
+                line-height: 1.5;
+                backdrop-filter: blur(14px);
+                -webkit-backdrop-filter: blur(14px);
+                box-shadow: 0 6px 20px rgba(0, 0, 0, 0.8), 0 0 10px rgba(0, 163, 255, 0.25);
+                transition: all 0.3s ease-in-out;
+                display: flex;
+                align-items: center;
+                gap: 14px;
+            }
 
-        .neon-demo-banner:hover {
-            box-shadow: 0 0 25px rgba(0, 163, 255, 0.85), 0 0 10px rgba(56, 189, 248, 0.6);
-            border-color: #38BDF8;
-            background-color: rgba(25, 42, 70, 0.85);
-            transform: translateY(-2px);
-        }
+            .neon-demo-banner:hover {
+                box-shadow: 0 0 25px rgba(0, 163, 255, 0.85), 0 0 10px rgba(56, 189, 248, 0.6);
+                border-color: #38BDF8;
+                background-color: rgba(25, 42, 70, 0.85);
+                transform: translateY(-2px);
+            }
 
-        .neon-demo-banner .banner-icon {
-            font-size: 1.6rem;
-            filter: drop-shadow(0 0 8px rgba(255, 200, 0, 0.85));
-            flex-shrink: 0;
-        }
+            .neon-demo-banner .banner-icon {
+                font-size: 1.6rem;
+                filter: drop-shadow(0 0 8px rgba(255, 200, 0, 0.85));
+                flex-shrink: 0;
+            }
 
-        .neon-demo-banner .banner-title {
-            color: #38BDF8;
-            font-weight: 800;
-            margin-right: 6px;
-            text-shadow: 0 0 10px rgba(56, 189, 248, 0.7);
-        }
+            .neon-demo-banner .banner-title {
+                color: #38BDF8;
+                font-weight: 800;
+                margin-right: 6px;
+                text-shadow: 0 0 10px rgba(56, 189, 248, 0.7);
+            }
 
-        .neon-demo-banner .banner-desc {
-            color: #FFFFFF;
-            font-weight: 600;
-        }
-        </style>
+            .neon-demo-banner .banner-desc {
+                color: #FFFFFF;
+                font-weight: 600;
+            }
+            </style>
 
-        <div class="neon-demo-banner">
-            <span class="banner-icon">💡</span>
-            <div>
-                <span class="banner-title">Demo Pair Loaded:</span>
-                <span class="banner-desc">Chandrayaan-2 OHRC High-Resolution Lunar Crater Strips (083537 vs 103311) — 0.25m Spatial Resolution.</span>
+            <div class="neon-demo-banner">
+                <span class="banner-icon">💡</span>
+                <div>
+                    <span class="banner-title">Demo Pair Loaded:</span>
+                    <span class="banner-desc">Chandrayaan-2 OHRC High-Resolution Lunar Crater Strips (083537 vs 103311) — 0.25m Spatial Resolution.</span>
+                </div>
             </div>
-        </div>
-        """, unsafe_allow_html=True)
+            """, unsafe_allow_html=True)
+        else:
+            st.warning("Sample pair not found on disk. Please upload custom files below.")
+            col_up1, col_up2 = st.columns(2)
+            with col_up1:
+                s_file = st.file_uploader("Upload Moving / Source (.tif)", type=["tif", "tiff"])
+            with col_up2:
+                r_file = st.file_uploader("Upload Fixed / Reference (.tif)", type=["tif", "tiff"])
     else:
-        st.warning("Sample pair not found on disk. Please upload custom files below.")
         col_up1, col_up2 = st.columns(2)
         with col_up1:
             s_file = st.file_uploader("Upload Moving / Source (.tif)", type=["tif", "tiff"])
         with col_up2:
             r_file = st.file_uploader("Upload Fixed / Reference (.tif)", type=["tif", "tiff"])
-else:
-    col_up1, col_up2 = st.columns(2)
-    with col_up1:
-        s_file = st.file_uploader("Upload Moving / Source (.tif)", type=["tif", "tiff"])
-    with col_up2:
-        r_file = st.file_uploader("Upload Fixed / Reference (.tif)", type=["tif", "tiff"])
 
-    if s_file and r_file:
-        run_id = uuid.uuid4().hex[:6]
-        tmp_s = f"temp_s_{run_id}.tif"
-        tmp_r = f"temp_r_{run_id}.tif"
-        with open(tmp_s, "wb") as f:
-            f.write(s_file.getbuffer())
-        with open(tmp_r, "wb") as f:
-            f.write(r_file.getbuffer())
+        if s_file and r_file:
+            run_id = uuid.uuid4().hex[:6]
+            tmp_s = f"temp_s_{run_id}.tif"
+            tmp_r = f"temp_r_{run_id}.tif"
+            with open(tmp_s, "wb") as f:
+                f.write(s_file.getbuffer())
+            with open(tmp_r, "wb") as f:
+                f.write(r_file.getbuffer())
 
-        try:
-            with rasterio.open(tmp_s) as s:
-                source_array = s.read(1)
-            with rasterio.open(tmp_r) as r:
-                reference_array = r.read(1)
-                ref_crs = r.crs
-                ref_transform = r.transform
-            source_name = s_file.name
-            reference_name = r_file.name
-        finally:
-            for p in (tmp_s, tmp_r):
-                if os.path.exists(p):
-                    os.remove(p)
+            try:
+                with rasterio.open(tmp_s) as s:
+                    source_array = s.read(1)
+                with rasterio.open(tmp_r) as r:
+                    reference_array = r.read(1)
+                    ref_crs = r.crs
+                    ref_transform = r.transform
+                source_name = s_file.name
+                reference_name = r_file.name
+            finally:
+                for p in (tmp_s, tmp_r):
+                    if os.path.exists(p):
+                        os.remove(p)
 
-# Prominent Full-Width Primary Execution Button
-run_pipeline_btn = st.button("🚀 Run Registration Pipeline", use_container_width=True)
+    # Prominent Full-Width Primary Execution Button
+    run_pipeline_btn = st.button("🚀 Run Registration Pipeline", use_container_width=True)
 
-if run_pipeline_btn:
-    if source_array is None or reference_array is None:
-        st.error("⚠️ Please select or upload both source and reference images.")
-    else:
-        with st.spinner(f"Aligning lunar imagery using {matcher_choice}..."):
-            t_start = time.time()
-            result = run_registration_pipeline(
-                source_img=source_array,
-                reference_img=reference_array,
-                sensor_pair_key=backend_sensor_key,
-                matcher_type=backend_matcher_type,
-                apply_clahe_flag=apply_clahe,
-                ransac_threshold=ransac_thresh,
-                enable_subpixel=enable_subpixel,
+    if run_pipeline_btn:
+        if source_array is None or reference_array is None:
+            st.error("⚠️ Please select or upload both source and reference images.")
+        else:
+            with st.spinner(f"Aligning lunar imagery using {matcher_choice}..."):
+                t_start = time.time()
+                result = run_registration_pipeline(
+                    source_img=source_array,
+                    reference_img=reference_array,
+                    sensor_pair_key=backend_sensor_key,
+                    matcher_type=backend_matcher_type,
+                    apply_clahe_flag=apply_clahe,
+                    ransac_threshold=ransac_thresh,
+                    enable_subpixel=enable_subpixel,
+                    ref_crs=ref_crs,
+                    ref_transform=ref_transform
+                )
+                t_elapsed = time.time() - t_start
+
+            # Multi-Metric Validation Gatekeeper
+            all_matches = result.get("matches", [])
+            ransac_inliers = result.get("inliers", [])
+            total_matches_count = len(all_matches)
+            inliers_count = len(ransac_inliers)
+
+            if total_matches_count == 0:
+                st.error("⚠️ REGISTRATION FAILED: Zero matches found. Images are completely unrelated.")
+                st.stop()
+
+            inlier_ratio = inliers_count / total_matches_count if total_matches_count > 0 else 0.0
+
+            if total_matches_count < 20 or inlier_ratio < 0.60:
+                st.error("⚠️ REGISTRATION FAILED: Structurally unrelated images detected. Please ensure you uploaded overlapping lunar terrain.")
+                st.warning(f"Diagnostics ➔ Total Matches: {total_matches_count} | Inlier Ratio: {inlier_ratio:.1%}")
+                st.info("The pipeline requires at least 20 matches and a 60% inlier ratio to prevent severe map distortion. The warping phase has been aborted.")
+                st.stop()
+
+            if not result["success"]:
+                st.error(f"❌ Alignment Failed: {result.get('error_message')}")
+                st.stop()
+
+            metrics = result.get("metrics", {})
+
+            st.markdown(f"""
+            <div style="
+                background-color: #031c10 !important;
+                background: #031c10 !important;
+                border: 2px solid #10B981 !important;
+                border-radius: 12px !important;
+                padding: 14px 22px !important;
+                margin-bottom: 12px !important;
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.98), 0 0 20px rgba(16, 185, 129, 0.4) !important;
+                color: #FFFFFF !important;
+                font-size: 1.1rem !important;
+                font-weight: 700 !important;
+            ">
+                ✅ <strong style="color: #34D399 !important; font-size: 1.15rem !important; font-weight: 800 !important;">Validation Passed!</strong> 
+                Inlier Ratio: {inlier_ratio:.1%}. Proceeding to warp...
+            </div>
+            <div style="
+                background-color: #031c10 !important;
+                background: #031c10 !important;
+                border: 2px solid #10B981 !important;
+                border-radius: 12px !important;
+                padding: 14px 22px !important;
+                margin-bottom: 20px !important;
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.98), 0 0 20px rgba(16, 185, 129, 0.4) !important;
+                color: #FFFFFF !important;
+                font-size: 1.1rem !important;
+                font-weight: 700 !important;
+            ">
+                ✅ <strong style="color: #34D399 !important; font-size: 1.15rem !important; font-weight: 800 !important;">Registration Succeeded</strong> in {result['elapsed_time_s']}s!
+            </div>
+            """, unsafe_allow_html=True)
+
+            # 1. Scientific KPI Dashboard
+            st.markdown("### 📊 Registration Metrics Dashboard")
+            m_col1, m_col2, m_col3, m_col4, m_col5, m_col6 = st.columns(6)
+        
+            with m_col1:
+                st.metric("Total Matches", f"{metrics['total_matches']:,}")
+            with m_col2:
+                st.metric("RANSAC Inliers", f"{metrics['inlier_count']:,}")
+            with m_col3:
+                st.metric("Inlier Ratio", f"{metrics['inlier_ratio']:.1%}")
+            with m_col4:
+                rmse_val = metrics['reprojection_rmse']
+                st.metric("Reprojection RMSE", f"{rmse_val:.3f} px")
+            with m_col5:
+                st.metric("Structural SSIM", f"{metrics['ssim_score']:.4f}")
+            with m_col6:
+                st.metric("Distribution Score", f"{metrics['distribution_score']:.3f}")
+
+            # 2. Tabbed Visual Inspection
+            tab_checker, tab_align, tab_vectors, tab_benchmark, tab_limitations = st.tabs([
+                "🏁 Checkerboard Alignment",
+                "🖼️ Side-by-Side Comparison",
+                "📍 Match Vectors",
+                "📈 Baseline Benchmark (Makharia et al.)",
+                "⚠️ Limitations & Terrain Report"
+            ])
+
+            # Tab 1: Checkerboard
+            with tab_checker:
+                st.markdown("#### Dynamic Checkerboard Mosaic")
+                st.caption("Crater rims and geological boundaries should line up seamlessly across alternating squares.")
+                tile_size = st.slider("Checkerboard Tile Size (pixels)", 16, 128, 48, 8)
+                chk_img = create_checkerboard_overlay(result["warped_image"], result["reference_processed"], tile_size=tile_size)
+                st.image(chk_img, caption=f"Checkerboard Blend ({tile_size}px grid) — Inspect edge continuity", use_container_width=True)
+
+            # Tab 2: Side-by-Side
+            with tab_align:
+                col_v1, col_v2, col_v3 = st.columns(3)
+                with col_v1:
+                    st.image(result["source_processed"], caption="Source / Moving (Preprocessed)", use_container_width=True)
+                with col_v2:
+                    st.image(result["reference_processed"], caption="Reference / Fixed (Preprocessed)", use_container_width=True)
+                with col_v3:
+                    st.image(result["warped_image"], caption="Warped Source (Aligned to Reference)", use_container_width=True)
+
+            # Tab 3: Match Vectors
+            with tab_vectors:
+                st.markdown("#### Feature Correspondence Vectors")
+                matches_to_plot = result["inliers"][:120]
+                h_max = max(result["source_processed"].shape[0], result["reference_processed"].shape[0])
+                w1 = result["source_processed"].shape[1]
+                w2 = result["reference_processed"].shape[1]
+                gap = 8
+                canvas = np.zeros((h_max, w1 + gap + w2), dtype=np.uint8)
+                canvas[:result["source_processed"].shape[0], :w1] = result["source_processed"]
+                canvas[:result["reference_processed"].shape[0], w1+gap:w1+gap+w2] = result["reference_processed"]
+                canvas_rgb = cv2.cvtColor(canvas, cv2.COLOR_GRAY2BGR)
+
+                for m in matches_to_plot:
+                    pt1 = (int(round(m[0])), int(round(m[1])))
+                    pt2 = (int(round(m[2])) + w1 + gap, int(round(m[3])))
+                    color = (0, 255, 128) if len(m) > 5 and m[5] == "lightglue" else (0, 200, 255)
+                    cv2.circle(canvas_rgb, pt1, 3, color, -1)
+                    cv2.circle(canvas_rgb, pt2, 3, color, -1)
+                    cv2.line(canvas_rgb, pt1, pt2, color, 1, cv2.LINE_AA)
+
+                st.image(canvas_rgb, caption=f"Inlier Correspondences (Showing {len(matches_to_plot)} of {len(result['inliers'])} points)", use_container_width=True)
+
+            # Tab 4: Baseline Benchmark
+            with tab_benchmark:
+                st.markdown("#### Comparative Benchmark vs ISRO Space Applications Centre (SAC) Baseline")
+                our_eval = {
+                    "test_type": f"SIH 2026 Current Run ({matcher_choice})",
+                    "total_matches": metrics["total_matches"],
+                    "inliers_after_ransac": metrics["inlier_count"],
+                    "inlier_ratio": metrics["inlier_ratio"],
+                    "reprojection_rmse": metrics["reprojection_rmse"],
+                    "distribution_score": metrics["distribution_score"],
+                    "ssim_score": metrics["ssim_score"]
+                }
+                bench_data = generate_comparison_table(our_eval)
+                st.caption(f"Reference: {bench_data['baseline_paper']}")
+            
+                col_b1, col_b2 = st.columns(2)
+                with col_b1:
+                    st.markdown("**Published SAC Paper Results (Makharia et al., arXiv:2509.04775):**")
+                    for scene_id, algs in bench_data["baseline_numbers"].items():
+                        with st.expander(f"📌 {scene_id}"):
+                            for algo, vals in algs.items():
+                                st.write(f"- **{algo}**: RMSE X={vals['rmse_x']}, RMSE Y={vals['rmse_y']}, Compute Time={vals['time_s']}s")
+            
+                with col_b2:
+                    st.markdown("**VyomaSutra Enhanced Solution:**")
+                    st.write(f"- **Matching Method**: {matcher_choice}")
+                    st.write(f"- **Inliers Recovered**: {metrics['inlier_count']} / {metrics['total_matches']}")
+                    st.write(f"- **Reprojection RMSE**: `{metrics['reprojection_rmse']:.4f} px`")
+                    st.write(f"- **Distribution Score**: `{metrics['distribution_score']:.4f}`")
+                    st.write(f"- **Structural SSIM**: `{metrics['ssim_score']:.4f}`")
+                    for n in bench_data["notes"]:
+                        st.caption(f"ℹ️ {n}")
+
+            # Tab 5: Limitations & Planetary Report
+            with tab_limitations:
+                st.markdown("#### Autonomous Planetary Risk Assessment")
+                lims = result.get("limitations", {})
+                conf_level = lims.get("confidence_level", "HIGH")
+                conf_emoji = {"HIGH": "🟢", "MODERATE": "LOW", "LOW": "🔴"}.get(conf_level, "⚪")
+                st.markdown(f"**Confidence Classification:** {conf_emoji} **{conf_level}**")
+            
+                warnings = lims.get("warnings", [])
+                if warnings:
+                    for w in warnings:
+                        st.warning(w)
+                else:
+                    st.success("No significant terrain risks detected. Good feature density and illumination contrast.")
+
+            # 3. GeoTIFF Export Section
+            st.markdown("---")
+            st.markdown("### 💾 GIS Product Delivery")
+            out_dir = os.path.join(ROOT_DIR, "outputs", "geotiff")
+            os.makedirs(out_dir, exist_ok=True)
+            export_path = os.path.join(out_dir, f"vyomasutra_aligned_{uuid.uuid4().hex[:6]}.tif")
+
+            exported = export_geotiff(
+                result["warped_image"],
+                export_path,
                 ref_crs=ref_crs,
                 ref_transform=ref_transform
             )
-            t_elapsed = time.time() - t_start
 
-        # Multi-Metric Validation Gatekeeper
-        all_matches = result.get("matches", [])
-        ransac_inliers = result.get("inliers", [])
-        total_matches_count = len(all_matches)
-        inliers_count = len(ransac_inliers)
-
-        if total_matches_count == 0:
-            st.error("⚠️ REGISTRATION FAILED: Zero matches found. Images are completely unrelated.")
-            st.stop()
-
-        inlier_ratio = inliers_count / total_matches_count if total_matches_count > 0 else 0.0
-
-        if total_matches_count < 20 or inlier_ratio < 0.60:
-            st.error("⚠️ REGISTRATION FAILED: Structurally unrelated images detected. Please ensure you uploaded overlapping lunar terrain.")
-            st.warning(f"Diagnostics ➔ Total Matches: {total_matches_count} | Inlier Ratio: {inlier_ratio:.1%}")
-            st.info("The pipeline requires at least 20 matches and a 60% inlier ratio to prevent severe map distortion. The warping phase has been aborted.")
-            st.stop()
-
-        if not result["success"]:
-            st.error(f"❌ Alignment Failed: {result.get('error_message')}")
-            st.stop()
-
-        metrics = result.get("metrics", {})
-
-        st.markdown(f"""
-        <div style="
-            background-color: #031c10 !important;
-            background: #031c10 !important;
-            border: 2px solid #10B981 !important;
-            border-radius: 12px !important;
-            padding: 14px 22px !important;
-            margin-bottom: 12px !important;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.98), 0 0 20px rgba(16, 185, 129, 0.4) !important;
-            color: #FFFFFF !important;
-            font-size: 1.1rem !important;
-            font-weight: 700 !important;
-        ">
-            ✅ <strong style="color: #34D399 !important; font-size: 1.15rem !important; font-weight: 800 !important;">Validation Passed!</strong> 
-            Inlier Ratio: {inlier_ratio:.1%}. Proceeding to warp...
-        </div>
-        <div style="
-            background-color: #031c10 !important;
-            background: #031c10 !important;
-            border: 2px solid #10B981 !important;
-            border-radius: 12px !important;
-            padding: 14px 22px !important;
-            margin-bottom: 20px !important;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.98), 0 0 20px rgba(16, 185, 129, 0.4) !important;
-            color: #FFFFFF !important;
-            font-size: 1.1rem !important;
-            font-weight: 700 !important;
-        ">
-            ✅ <strong style="color: #34D399 !important; font-size: 1.15rem !important; font-weight: 800 !important;">Registration Succeeded</strong> in {result['elapsed_time_s']}s!
-        </div>
-        """, unsafe_allow_html=True)
-
-        # 1. Scientific KPI Dashboard
-        st.markdown("### 📊 Registration Metrics Dashboard")
-        m_col1, m_col2, m_col3, m_col4, m_col5, m_col6 = st.columns(6)
-        
-        with m_col1:
-            st.metric("Total Matches", f"{metrics['total_matches']:,}")
-        with m_col2:
-            st.metric("RANSAC Inliers", f"{metrics['inlier_count']:,}")
-        with m_col3:
-            st.metric("Inlier Ratio", f"{metrics['inlier_ratio']:.1%}")
-        with m_col4:
-            rmse_val = metrics['reprojection_rmse']
-            st.metric("Reprojection RMSE", f"{rmse_val:.3f} px")
-        with m_col5:
-            st.metric("Structural SSIM", f"{metrics['ssim_score']:.4f}")
-        with m_col6:
-            st.metric("Distribution Score", f"{metrics['distribution_score']:.3f}")
-
-        # 2. Tabbed Visual Inspection
-        tab_checker, tab_align, tab_vectors, tab_benchmark, tab_limitations = st.tabs([
-            "🏁 Checkerboard Alignment",
-            "🖼️ Side-by-Side Comparison",
-            "📍 Match Vectors",
-            "📈 Baseline Benchmark (Makharia et al.)",
-            "⚠️ Limitations & Terrain Report"
-        ])
-
-        # Tab 1: Checkerboard
-        with tab_checker:
-            st.markdown("#### Dynamic Checkerboard Mosaic")
-            st.caption("Crater rims and geological boundaries should line up seamlessly across alternating squares.")
-            tile_size = st.slider("Checkerboard Tile Size (pixels)", 16, 128, 48, 8)
-            chk_img = create_checkerboard_overlay(result["warped_image"], result["reference_processed"], tile_size=tile_size)
-            st.image(chk_img, caption=f"Checkerboard Blend ({tile_size}px grid) — Inspect edge continuity", use_container_width=True)
-
-        # Tab 2: Side-by-Side
-        with tab_align:
-            col_v1, col_v2, col_v3 = st.columns(3)
-            with col_v1:
-                st.image(result["source_processed"], caption="Source / Moving (Preprocessed)", use_container_width=True)
-            with col_v2:
-                st.image(result["reference_processed"], caption="Reference / Fixed (Preprocessed)", use_container_width=True)
-            with col_v3:
-                st.image(result["warped_image"], caption="Warped Source (Aligned to Reference)", use_container_width=True)
-
-        # Tab 3: Match Vectors
-        with tab_vectors:
-            st.markdown("#### Feature Correspondence Vectors")
-            matches_to_plot = result["inliers"][:120]
-            h_max = max(result["source_processed"].shape[0], result["reference_processed"].shape[0])
-            w1 = result["source_processed"].shape[1]
-            w2 = result["reference_processed"].shape[1]
-            canvas = np.zeros((h_max, w1 + w2), dtype=np.uint8)
-            canvas[:result["source_processed"].shape[0], :w1] = result["source_processed"]
-            canvas[:result["reference_processed"].shape[0], w1:w1+w2] = result["reference_processed"]
-            canvas_rgb = cv2.cvtColor(canvas, cv2.COLOR_GRAY2BGR)
-
-            for m in matches_to_plot:
-                pt1 = (int(round(m[0])), int(round(m[1])))
-                pt2 = (int(round(m[2])) + w1, int(round(m[3])))
-                color = (0, 255, 128) if len(m) > 5 and m[5] == "lightglue" else (0, 200, 255)
-                cv2.circle(canvas_rgb, pt1, 3, color, -1)
-                cv2.circle(canvas_rgb, pt2, 3, color, -1)
-                cv2.line(canvas_rgb, pt1, pt2, color, 1, cv2.LINE_AA)
-
-            st.image(canvas_rgb, caption=f"Inlier Correspondences (Showing {len(matches_to_plot)} of {len(result['inliers'])} points)", use_container_width=True)
-
-        # Tab 4: Baseline Benchmark
-        with tab_benchmark:
-            st.markdown("#### Comparative Benchmark vs ISRO Space Applications Centre (SAC) Baseline")
-            our_eval = {
-                "test_type": f"SIH 2026 Current Run ({matcher_choice})",
-                "total_matches": metrics["total_matches"],
-                "inliers_after_ransac": metrics["inlier_count"],
-                "inlier_ratio": metrics["inlier_ratio"],
-                "reprojection_rmse": metrics["reprojection_rmse"],
-                "distribution_score": metrics["distribution_score"],
-                "ssim_score": metrics["ssim_score"]
-            }
-            bench_data = generate_comparison_table(our_eval)
-            st.caption(f"Reference: {bench_data['baseline_paper']}")
-            
-            col_b1, col_b2 = st.columns(2)
-            with col_b1:
-                st.markdown("**Published SAC Paper Results (Makharia et al., arXiv:2509.04775):**")
-                for scene_id, algs in bench_data["baseline_numbers"].items():
-                    with st.expander(f"📌 {scene_id}"):
-                        for algo, vals in algs.items():
-                            st.write(f"- **{algo}**: RMSE X={vals['rmse_x']}, RMSE Y={vals['rmse_y']}, Compute Time={vals['time_s']}s")
-            
-            with col_b2:
-                st.markdown("**VyomaSutra Enhanced Solution:**")
-                st.write(f"- **Matching Method**: {matcher_choice}")
-                st.write(f"- **Inliers Recovered**: {metrics['inlier_count']} / {metrics['total_matches']}")
-                st.write(f"- **Reprojection RMSE**: `{metrics['reprojection_rmse']:.4f} px`")
-                st.write(f"- **Distribution Score**: `{metrics['distribution_score']:.4f}`")
-                st.write(f"- **Structural SSIM**: `{metrics['ssim_score']:.4f}`")
-                for n in bench_data["notes"]:
-                    st.caption(f"ℹ️ {n}")
-
-        # Tab 5: Limitations & Planetary Report
-        with tab_limitations:
-            st.markdown("#### Autonomous Planetary Risk Assessment")
-            lims = result.get("limitations", {})
-            conf_level = lims.get("confidence_level", "HIGH")
-            conf_emoji = {"HIGH": "🟢", "MODERATE": "LOW", "LOW": "🔴"}.get(conf_level, "⚪")
-            st.markdown(f"**Confidence Classification:** {conf_emoji} **{conf_level}**")
-            
-            warnings = lims.get("warnings", [])
-            if warnings:
-                for w in warnings:
-                    st.warning(w)
-            else:
-                st.success("No significant terrain risks detected. Good feature density and illumination contrast.")
-
-        # 3. GeoTIFF Export Section
-        st.markdown("---")
-        st.markdown("### 💾 GIS Product Delivery")
-        out_dir = os.path.join(ROOT_DIR, "outputs", "geotiff")
-        os.makedirs(out_dir, exist_ok=True)
-        export_path = os.path.join(out_dir, f"vyomasutra_aligned_{uuid.uuid4().hex[:6]}.tif")
-
-        exported = export_geotiff(
-            result["warped_image"],
-            export_path,
-            ref_crs=ref_crs,
-            ref_transform=ref_transform
-        )
-
-        if exported and os.path.exists(export_path):
-            with open(export_path, "rb") as f:
-                st.download_button(
-                    label="⬇️ Download Aligned Lunar GeoTIFF (GIS Compatible)",
-                    data=f,
-                    file_name="vyomasutra_lunar_aligned.tif",
-                    mime="image/tiff",
-                    type="primary"
-                )
-            st.caption("✅ GeoTIFF includes true spatial affine transformation and Lunar cartographic CRS inherited from the reference dataset.")
+            if exported and os.path.exists(export_path):
+                with open(export_path, "rb") as f:
+                    st.download_button(
+                        label="⬇️ Download Aligned Lunar GeoTIFF (GIS Compatible)",
+                        data=f,
+                        file_name="vyomasutra_lunar_aligned.tif",
+                        mime="image/tiff",
+                        type="primary"
+                    )
+                st.caption("✅ GeoTIFF includes true spatial affine transformation and Lunar cartographic CRS inherited from the reference dataset.")
