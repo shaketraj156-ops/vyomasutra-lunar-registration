@@ -533,8 +533,8 @@ def inject_threejs_moon_background():
             badge.id = badgeId;
             badge.style.cssText = `
                 position: fixed !important;
-                bottom: 30px !important;
-                right: 40px !important;
+                bottom: 75px !important;
+                right: 105px !important;
                 z-index: 999999 !important;
                 width: 85px !important;
                 height: 85px !important;
@@ -610,8 +610,8 @@ def inject_local_mp4_background_video():
                 }
                 #vyoma-lunar-flux-badge {
                     position: fixed !important;
-                    bottom: 30px !important;
-                    right: 35px !important;
+                    bottom: 75px !important;
+                    right: 105px !important;
                     z-index: 999999 !important;
                     width: 80px !important;
                     height: 80px !important;
