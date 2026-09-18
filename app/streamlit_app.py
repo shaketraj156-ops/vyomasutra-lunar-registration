@@ -55,7 +55,7 @@ st.set_page_config(
     page_title="VyomaSutra | Lunar Image Registration Engine",
     page_icon="🌙",
     layout="wide",
-    initial_sidebar_state="expanded"
+    initial_sidebar_state="collapsed"
 )
 
 def inject_threejs_moon_background():
@@ -79,12 +79,27 @@ def inject_threejs_moon_background():
         background-color: #03050a !important;
     }
 
-    /* Glassmorphism Dark Sidebar */
-    [data-testid="stSidebar"] {
-        background-color: rgba(11, 16, 29, 0.85) !important;
-        backdrop-filter: blur(16px) saturate(180%);
-        -webkit-backdrop-filter: blur(16px) saturate(180%);
-        border-right: 1px solid rgba(255, 255, 255, 0.1) !important;
+    /* Completely hide Streamlit sidebar and toggle button */
+    [data-testid="stSidebar"], 
+    section[data-testid="stSidebar"], 
+    [data-testid="collapsedControl"],
+    button[data-testid="baseButton-headerNoPadding"],
+    div[data-testid="stSidebarCollapseButton"] {
+        display: none !important;
+        visibility: hidden !important;
+        width: 0 !important;
+        max-width: 0 !important;
+        min-width: 0 !important;
+    }
+
+    [data-testid="stMain"], 
+    .stMainBlockContainer, 
+    div[data-testid="stAppViewBlockContainer"], 
+    section.main {
+        margin-left: 0 !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        padding-top: 0.5rem !important;
     }
     
     /* Ensure main content floats above the 3D Moon canvas */
@@ -534,15 +549,17 @@ def inject_local_mp4_background_video():
         var pWin = window.parent || window;
         var pDoc = pWin.document;
 
-        // Force transparent backgrounds in parent document
+        // Force transparent backgrounds across all Streamlit parent containers
         var styleId = 'vyoma-video-bg-css';
-        if (!pDoc.getElementById(styleId)) {
+        var existingStyle = pDoc.getElementById(styleId);
+        if (!existingStyle) {
             var style = pDoc.createElement('style');
             style.id = styleId;
             style.innerHTML = `
                 html, body, .stApp, [data-testid="stAppViewContainer"], 
                 [data-testid="stHeader"], header, [data-testid="stMain"], 
-                .main, section.main, .stMainBlockContainer {
+                .main, section.main, .stMainBlockContainer, [data-testid="stAppViewBlockContainer"],
+                div[class*="stApp"], div[data-testid="stBottom"], div[class*="block-container"] {
                     background: transparent !important;
                     background-color: transparent !important;
                 }
@@ -558,7 +575,10 @@ def inject_local_mp4_background_video():
                     object-fit: cover !important;
                     z-index: 1 !important;
                     pointer-events: none !important;
-                    filter: brightness(0.58) contrast(1.10) !important;
+                    filter: brightness(0.68) contrast(1.10) !important;
+                    display: block !important;
+                    opacity: 1 !important;
+                    visibility: visible !important;
                 }
                 [data-testid="stMain"], [data-testid="stSidebar"] {
                     position: relative !important;
@@ -607,30 +627,6 @@ def inject_local_mp4_background_video():
             pDoc.body.appendChild(badge);
         } else if (badge) {
             badge.style.display = 'flex';
-            badge.style.cssText = `
-                position: fixed !important;
-                bottom: 50px !important;
-                right: 115px !important;
-                z-index: 999999 !important;
-                width: 80px !important;
-                height: 80px !important;
-                padding: 8px !important;
-                box-sizing: border-box !important;
-                display: flex !important;
-                align-items: center !important;
-                justify-content: center !important;
-                background-color: #03060d !important;
-                background: radial-gradient(circle, rgba(11, 16, 29, 0.98) 0%, rgba(3, 6, 13, 0.98) 100%) !important;
-                border: 2px solid #00A3FF !important;
-                border-radius: 14px !important;
-                box-shadow: 0 0 22px rgba(0, 163, 255, 0.85), 0 8px 30px rgba(0, 0, 0, 0.95) !important;
-                backdrop-filter: blur(16px) !important;
-                -webkit-backdrop-filter: blur(16px) !important;
-                pointer-events: auto !important;
-            `;
-            badge.innerHTML = `
-                <img src="data:image/png;base64,` + logoB64 + `" style="width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 0 8px rgba(0, 163, 255, 0.9));" alt="Lunar Flux Logo">
-            `;
         }
 
         // Create or show Local Video background
@@ -641,17 +637,23 @@ def inject_local_mp4_background_video():
             video.autoplay = true;
             video.loop = true;
             video.muted = true;
+            video.defaultMuted = true;
+            video.playsInline = true;
             video.setAttribute('playsinline', '');
+            video.setAttribute('muted', '');
+            video.setAttribute('autoplay', '');
+            video.setAttribute('loop', '');
+            video.style.cssText = 'position: fixed !important; top: 0 !important; left: 0 !important; width: 100vw !important; height: 100vh !important; object-fit: cover !important; z-index: 1 !important; pointer-events: none !important; filter: brightness(0.68) contrast(1.10) !important; display: block !important; opacity: 1 !important; visibility: visible !important;';
             
             var videoSrc = "data:video/mp4;base64," + "__LOCAL_VIDEO_B64__";
             video.src = videoSrc;
             pDoc.body.appendChild(video);
-            video.play().catch(function(e) {});
         } else {
             video.style.display = 'block';
-            video.style.filter = 'brightness(0.60) contrast(1.10)';
-            video.play().catch(function(e) {});
+            video.style.visibility = 'visible';
+            video.style.opacity = '1';
         }
+        video.play().catch(function(e) {});
     })();
     </script>
     """
@@ -726,77 +728,368 @@ def inject_youtube_background_video(video_id="pPuYfnaj_cc"):
     """
     components.html(js_code, height=0, width=0)
 
-# Sidebar Configuration
-team_logo_path = os.path.join(ROOT_DIR, "app", "team_logo.png")
-if not os.path.exists(team_logo_path):
-    team_logo_path = os.path.join(ROOT_DIR, "team_logo.png")
-
-if os.path.exists(team_logo_path):
-    st.sidebar.image(team_logo_path, use_container_width=True)
-else:
-    st.sidebar.markdown("### 🌙 TEAM LUNAR FLUX")
-
 # Always attach Gemini generated video as the primary background
 inject_local_mp4_background_video()
 
-st.sidebar.markdown("### ⚙️ Pipeline Configuration")
+# Page Routing System using session state
+if "current_page" not in st.session_state:
+    st.session_state["current_page"] = "✨ VyomaSutra Homepage"
 
-input_mode = st.sidebar.radio(
-    "Input Mode",
-    ["🎯 Preloaded Lunar Demo Pair (Instant Demo)", "📂 Upload Custom TIFF Files"],
-    index=0
-)
+# Classic Glass Top Navigation Header
+top_nav_col1, top_nav_col2 = st.columns([1.5, 1.2])
 
-sensor_pair = st.sidebar.selectbox(
-    "Sensor Pair Profile",
-    [
-        "OHRC — LROC NAC (High-Resolution Zoom: 0.25m)",
-        "TMC-2 — LROC WAC (Terrain Mapping: 5m)",
-        "IIRS — LROC WAC (Infrared Hyperspectral: 80m)"
-    ],
-    index=0
-)
+with top_nav_col1:
+    st.markdown("""
+    <div style="display: flex; align-items: center; gap: 14px; padding: 4px 0;">
+        <span style="font-size: 2.3rem; filter: drop-shadow(0 0 12px rgba(0, 163, 255, 0.9));">🌙</span>
+        <div>
+            <div style="font-size: 1.8rem; font-weight: 900; color: #FFFFFF; text-shadow: 0 0 16px rgba(0, 163, 255, 0.9); letter-spacing: 1px; line-height: 1.1;">
+                VyomaSutra
+            </div>
+            <div style="font-size: 0.85rem; font-weight: 700; color: #38BDF8; letter-spacing: 0.5px;">
+                Autonomous Sub-Pixel Lunar Image Registration Engine &bull; SIH 2026 (PS 26166)
+            </div>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
 
-matcher_choice = st.sidebar.selectbox(
-    "Matching Engine",
-    [
-        "Dual Ensemble (SuperPoint+LightGlue + SIFT)",
-        "Deep LightGlue + SuperPoint",
-        "Classical SIFT Baseline"
-    ],
-    index=0
-)
+with top_nav_col2:
+    nav_options = ["✨ VyomaSutra Homepage", "🚀 Command Center & Engine"]
+    curr_index = 0 if st.session_state["current_page"] == "✨ VyomaSutra Homepage" else 1
 
-# Key mappings for backend
-sensor_key_map = {
-    "OHRC": "OHRC_LROC",
-    "TMC-2": "TMC_LROC",
-    "IIRS": "IIRS_LROC"
+    selected_top_mode = st.radio(
+        "Top Navigation Mode",
+        nav_options,
+        index=curr_index,
+        horizontal=True,
+        label_visibility="collapsed",
+        key="top_nav_radio_select"
+    )
+    if selected_top_mode != st.session_state["current_page"]:
+        st.session_state["current_page"] = selected_top_mode
+        st.rerun()
+
+st.markdown("""
+<style>
+/* Style Horizontal Top Navigation Radio Buttons into Futuristic Glass Pills */
+div[data-testid="stRadio"] > div {
+    flex-direction: row !important;
+    gap: 12px !important;
+    justify-content: flex-end !important;
+    margin-top: 6px !important;
 }
-selected_sensor_prefix = sensor_pair.split(" ")[0]
-backend_sensor_key = sensor_key_map.get(selected_sensor_prefix, "OHRC_LROC")
-
-backend_matcher_map = {
-    "Dual Ensemble (SuperPoint+LightGlue + SIFT)": "dual",
-    "Deep LightGlue + SuperPoint": "lightglue",
-    "Classical SIFT Baseline": "sift"
+div[data-testid="stRadio"] label {
+    background: rgba(15, 23, 42, 0.88) !important;
+    border: 1.5px solid rgba(56, 189, 248, 0.4) !important;
+    border-radius: 25px !important;
+    padding: 10px 22px !important;
+    cursor: pointer !important;
+    color: #FFFFFF !important;
+    font-weight: 700 !important;
+    font-size: 0.95rem !important;
+    transition: all 0.3s ease !important;
+    backdrop-filter: blur(14px) !important;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6) !important;
 }
-backend_matcher_type = backend_matcher_map.get(matcher_choice, "dual")
+div[data-testid="stRadio"] label:hover {
+    border-color: #00A3FF !important;
+    background: rgba(0, 163, 255, 0.2) !important;
+    box-shadow: 0 0 20px rgba(0, 163, 255, 0.7) !important;
+    transform: translateY(-1px) !important;
+}
+div[data-testid="stRadio"] label[data-checked="true"], 
+div[data-testid="stRadio"] label:has(input:checked) {
+    background: linear-gradient(90deg, #0284C7 0%, #00A3FF 100%) !important;
+    border-color: #FFFFFF !important;
+    color: #FFFFFF !important;
+    box-shadow: 0 6px 22px rgba(0, 163, 255, 0.85) !important;
+}
+div[data-testid="stRadio"] input {
+    display: none !important;
+}
+</style>
+<hr style="border: 0; height: 1px; background: linear-gradient(90deg, transparent, rgba(56, 189, 248, 0.5), transparent); margin: 15px 0 25px 0;">
+""", unsafe_allow_html=True)
 
-with st.sidebar.expander("🛠️ Advanced Parameters", expanded=False):
-    apply_clahe = st.checkbox("CLAHE Illumination Equalization", value=True, help="Equalizes extreme lunar shadow-contrast")
-    enable_subpixel = st.checkbox("Sub-pixel Keypoint Refinement", value=True, help="Refines detected points to sub-pixel coordinates")
-    ransac_thresh = st.slider("RANSAC Inlier Threshold (px)", 1.0, 10.0, 3.0, 0.5)
+if st.session_state["current_page"] == "✨ VyomaSutra Homepage":
+    st.markdown("""
+    <style>
+    .classic-hero-card {
+        background: linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(6, 11, 22, 0.92) 100%);
+        border: 2px solid #00A3FF;
+        border-radius: 20px;
+        padding: 40px 35px;
+        text-align: center;
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        margin-top: 5px;
+        margin-bottom: 30px;
+        box-shadow: 0 15px 50px rgba(0, 0, 0, 0.95), 0 0 30px rgba(0, 163, 255, 0.45);
+        position: relative;
+        overflow: hidden;
+    }
+    .classic-hero-card::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(0, 163, 255, 0.08) 0%, transparent 70%);
+        pointer-events: none;
+    }
+    .classic-hero-card h1 {
+        color: #FFFFFF !important;
+        font-size: 3.2rem !important;
+        font-weight: 900 !important;
+        letter-spacing: 1.5px !important;
+        margin-bottom: 10px !important;
+        text-shadow: 0 0 22px rgba(0, 163, 255, 0.9) !important;
+    }
+    .classic-hero-card .subtitle {
+        color: #38BDF8 !important;
+        font-size: 1.35rem !important;
+        font-weight: 700 !important;
+        margin-bottom: 18px !important;
+        text-shadow: 0 0 10px rgba(56, 189, 248, 0.6) !important;
+    }
+    .classic-hero-card .badge-tag {
+        display: inline-block;
+        background: rgba(0, 163, 255, 0.15);
+        border: 1.5px solid #00A3FF;
+        color: #FFFFFF;
+        border-radius: 25px;
+        padding: 8px 24px;
+        font-size: 0.95rem;
+        font-weight: 800;
+        letter-spacing: 0.8px;
+        box-shadow: 0 0 15px rgba(0, 163, 255, 0.3);
+    }
+    .metric-ribbon-card {
+        background: rgba(15, 23, 42, 0.85);
+        border: 1px solid rgba(56, 189, 248, 0.35);
+        border-radius: 12px;
+        padding: 16px 20px;
+        text-align: center;
+        backdrop-filter: blur(14px);
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.8);
+    }
+    .metric-ribbon-card .val {
+        color: #38BDF8;
+        font-size: 1.4rem;
+        font-weight: 800;
+        text-shadow: 0 0 12px rgba(56, 189, 248, 0.7);
+    }
+    .metric-ribbon-card .lbl {
+        color: #94A3B8;
+        font-size: 0.85rem;
+        font-weight: 600;
+    }
+    .feature-card {
+        background: linear-gradient(145deg, rgba(15, 23, 42, 0.90) 0%, rgba(11, 16, 29, 0.85) 100%);
+        border: 1px solid rgba(56, 189, 248, 0.35);
+        border-radius: 16px;
+        padding: 26px 22px;
+        backdrop-filter: blur(16px);
+        height: 100%;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.85);
+        transition: all 0.35 ease;
+    }
+    .feature-card:hover {
+        border-color: #00A3FF;
+        box-shadow: 0 12px 35px rgba(0, 163, 255, 0.45);
+        transform: translateY(-4px);
+    }
+    .feature-card h4 {
+        color: #38BDF8 !important;
+        font-weight: 800 !important;
+        font-size: 1.15rem !important;
+        margin-bottom: 10px !important;
+    }
+    .feature-card p {
+        color: #CBD5E1 !important;
+        font-size: 0.95rem !important;
+        line-height: 1.55 !important;
+    }
+    </style>
 
-# Load / Upload Data & Main View Columns
-source_array = None
-reference_array = None
-ref_crs = None
-ref_transform = None
-source_name = "Source Image"
-reference_name = "Reference Image"
+    <div class="classic-hero-card">
+        <h1>🌙 VYOMASUTRA</h1>
+        <div class="subtitle">Autonomous Sub-Pixel Lunar Image Registration Engine</div>
+        <div class="badge-tag">SIH 2026 &bull; Problem Statement 26166 &bull; TEAM LUNAR FLUX</div>
+    </div>
+    """, unsafe_allow_html=True)
 
-sample_dir = os.path.join(ROOT_DIR, "data", "samples")
+    # Metric summary ribbon
+    r1, r2, r3, r4 = st.columns(4)
+    with r1:
+        st.markdown("""
+        <div class="metric-ribbon-card">
+            <div class="val">&lt; 0.25 px</div>
+            <div class="lbl">Reprojection RMSE Accuracy</div>
+        </div>
+        """, unsafe_allow_html=True)
+    with r2:
+        st.markdown("""
+        <div class="metric-ribbon-card">
+            <div class="val">SuperPoint + LightGlue</div>
+            <div class="lbl">Deep Neural Transformer Matcher</div>
+        </div>
+        """, unsafe_allow_html=True)
+    with r3:
+        st.markdown("""
+        <div class="metric-ribbon-card">
+            <div class="val">IAU 2000 Lunar CRS</div>
+            <div class="lbl">GIS Ready Cartographic Export</div>
+        </div>
+        """, unsafe_allow_html=True)
+    with r4:
+        st.markdown("""
+        <div class="metric-ribbon-card">
+            <div class="val">100% Autonomous</div>
+            <div class="lbl">Multi-Metric Risk Gatekeeper</div>
+        </div>
+        """, unsafe_allow_html=True)
+
+    st.write("")
+    st.write("")
+
+    # Feature grid
+    c1, c2, c3, c4 = st.columns(4)
+    with c1:
+        st.markdown("""
+        <div class="feature-card">
+            <h4>🎯 Sub-Pixel Precision</h4>
+            <p>Recovers homography alignment to <b>&lt; 0.25 px RMSE</b> using sub-pixel Taylor gradient expansion.</p>
+        </div>
+        """, unsafe_allow_html=True)
+    with c2:
+        st.markdown("""
+        <div class="feature-card">
+            <h4>⚡ Dual Matcher</h4>
+            <p>Combines <b>Deep LightGlue + SuperPoint</b> with classical SIFT for high inlier yield in extreme shadows.</p>
+        </div>
+        """, unsafe_allow_html=True)
+    with c3:
+        st.markdown("""
+        <div class="feature-card">
+            <h4>🗺️ GIS Product Delivery</h4>
+            <p>Exports affine-aligned <b>GeoTIFF</b> rasters with true IAU 2000 Lunar Cartographic CRS metadata.</p>
+        </div>
+        """, unsafe_allow_html=True)
+    with c4:
+        st.markdown("""
+        <div class="feature-card">
+            <h4>🛡️ Risk Gatekeeper</h4>
+            <p>Autonomous multi-metric quality assessment evaluating SSIM, Distribution Score, and Illumination Risk.</p>
+        </div>
+        """, unsafe_allow_html=True)
+
+    st.markdown("---")
+    st.markdown("### ⚙️ System Architecture Overview")
+    
+    st.markdown("""
+    | Component Layer | Technology Stack | Scientific Target |
+    | :--- | :--- | :--- |
+    | **Preprocessing** | CLAHE + Resampling | Illumination equalization across extreme lunar crater shadows |
+    | **Deep Feature Extraction** | SuperPoint + LightGlue | Transformer-based deep keypoint matching for low-texture polar terrain |
+    | **Classical Baseline** | SIFT + RANSAC Filter | High-speed, robust geometric fallback |
+    | **Sub-pixel Refinement** | Taylor Gradient Expansion | Sub-pixel accuracy down to < 0.25 px reprojection RMSE |
+    | **GIS Cartographic Export** | Rasterio + GDAL GTiff | IAU 2000 Lunar Cartographic Reference System GeoTIFF delivery |
+    """)
+
+    st.markdown("---")
+    st.write("")
+    
+    col_launch_btn, _ = st.columns([2, 1])
+    with col_launch_btn:
+        if st.button("🚀 Launch Command Center Engine", key="btn_enter_cmd_center"):
+            st.session_state["current_page"] = "🚀 Command Center & Engine"
+            st.rerun()
+
+else:
+    # -------------------------------------------------------------
+    # PAGE 2: COMMAND CENTER & ENGINE
+    # -------------------------------------------------------------
+    st.markdown("""
+    <div style="
+        background: linear-gradient(135deg, rgba(15, 23, 42, 0.92) 0%, rgba(11, 16, 29, 0.88) 100%);
+        border: 1.5px solid rgba(56, 189, 248, 0.45);
+        border-radius: 14px;
+        padding: 18px 24px;
+        margin-bottom: 22px;
+        backdrop-filter: blur(18px);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.8), 0 0 20px rgba(56, 189, 248, 0.25);
+    ">
+        <div style="color: #38BDF8; font-size: 1.15rem; font-weight: 800; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+            ⚙️ Pipeline Engine & Sensor Configuration
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+
+    cfg_c1, cfg_c2, cfg_c3, cfg_c4 = st.columns([1.2, 1.4, 1.4, 1.0])
+
+    with cfg_c1:
+        input_mode = st.selectbox(
+            "Input Mode",
+            ["🎯 Preloaded Lunar Demo Pair (Instant Demo)", "📂 Upload Custom TIFF Files"],
+            index=0
+        )
+
+    with cfg_c2:
+        sensor_pair = st.selectbox(
+            "Sensor Pair Profile",
+            [
+                "OHRC — LROC NAC (High-Resolution Zoom: 0.25m)",
+                "TMC-2 — LROC WAC (Terrain Mapping: 5m)",
+                "IIRS — LROC WAC (Infrared Hyperspectral: 80m)"
+            ],
+            index=0
+        )
+
+    with cfg_c3:
+        matcher_choice = st.selectbox(
+            "Matching Engine",
+            [
+                "Dual Ensemble (SuperPoint+LightGlue + SIFT)",
+                "Deep LightGlue + SuperPoint",
+                "Classical SIFT Baseline"
+            ],
+            index=0
+        )
+
+    with cfg_c4:
+        with st.popover("🛠️ Parameters", use_container_width=True):
+            st.markdown("#### Advanced Settings")
+            apply_clahe = st.checkbox("CLAHE Equalization", value=True, help="Equalizes extreme lunar shadow-contrast")
+            enable_subpixel = st.checkbox("Sub-pixel Refinement", value=True, help="Refines detected points to sub-pixel coordinates")
+            ransac_thresh = st.slider("RANSAC Thresh (px)", 1.0, 10.0, 3.0, 0.5)
+
+    # Key mappings for backend
+    sensor_key_map = {
+        "OHRC": "OHRC_LROC",
+        "TMC-2": "TMC_LROC",
+        "IIRS": "IIRS_LROC"
+    }
+    selected_sensor_prefix = sensor_pair.split(" ")[0]
+    backend_sensor_key = sensor_key_map.get(selected_sensor_prefix, "OHRC_LROC")
+
+    backend_matcher_map = {
+        "Dual Ensemble (SuperPoint+LightGlue + SIFT)": "dual",
+        "Deep LightGlue + SuperPoint": "lightglue",
+        "Classical SIFT Baseline": "sift"
+    }
+    backend_matcher_type = backend_matcher_map.get(matcher_choice, "dual")
+
+    # Load / Upload Data & Main View Columns
+    source_array = None
+    reference_array = None
+    ref_crs = None
+    ref_transform = None
+    source_name = "Source Image"
+    reference_name = "Reference Image"
+
+    sample_dir = os.path.join(ROOT_DIR, "data", "samples")
 src_sample_path = os.path.join(sample_dir, "ch2_ohr_ncp_20220914T0835371412_g_grd_d32.tif")
 ref_sample_path = os.path.join(sample_dir, "ch2_ohr_ncp_20220914T1033119094_g_grd_d32.tif")
 if not (os.path.exists(src_sample_path) and os.path.exists(ref_sample_path)):
