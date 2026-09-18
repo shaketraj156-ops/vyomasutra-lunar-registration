@@ -154,6 +154,7 @@ def run_registration_pipeline(
         clean_matches = strip_source_tag(raw_matches)
         inliers, H = filter_ransac(clean_matches, ransac_thresh=ransac_threshold)
         print(f"[CHECKPOINT] 3. RANSAC complete ({len(inliers)} inliers)")
+        result["inliers"] = inliers
 
         if H is None or len(inliers) < 4:
             result["error_message"] = "Geometric alignment failed: Homography matrix could not be estimated."
