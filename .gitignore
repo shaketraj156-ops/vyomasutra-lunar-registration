@@ -1,5 +1,19 @@
-data/ 
-*.tif 
-outputs/ 
-__pycache__/ 
-venv/ 
+# Python & Environment Caches
+__pycache__/
+*.pyc
+venv/
+.pytest_cache/
+.vscode/
+.idea/
+
+# Ignore large MP4 videos, raw/processed data, and outputs
+data/*.mp4
+data/raw/
+data/processed/
+data/reference/
+outputs/
+
+# Allow and Track Preloaded Demo Samples for Teammates & Judges
+!data/
+!data/samples/
+!data/samples/*
