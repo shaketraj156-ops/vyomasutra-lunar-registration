@@ -523,76 +523,7 @@ def inject_threejs_moon_background():
             });
         }
 
-        if (!pWin.THREE) {
-            var script = pDoc.createElement('script');
-            script.src = 'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js';
-            script.onload = startThree;
-            pDoc.head.appendChild(script);
-        } else {
-            startThree();
-        }
-    })();
-    </script>
-    """
-    js_code = js_code.replace("__NASA_MAP_B64__", NASA_MOON_MAP_B64).replace("__NASA_BUMP_B64__", NASA_MOON_BUMP_B64)
-    components.html(js_code, height=0, width=0)
-
-def inject_local_mp4_background_video():
-    """
-    Injects your uploaded MP4 video (gemini_generated_video_ef3f1bf2.mp4) 
-    as a full-screen, looping, muted background video behind the glassmorphic Streamlit UI,
-    with 4,500 twinkling 3D starfield particles floating on top!
-    """
-    js_code = """
-    <script>
-    (function() {
-        var pWin = window.parent || window;
-        var pDoc = pWin.document;
-
-        // Force transparent backgrounds across all Streamlit parent containers
-        var styleId = 'vyoma-video-bg-css';
-        var existingStyle = pDoc.getElementById(styleId);
-        if (!existingStyle) {
-            var style = pDoc.createElement('style');
-            style.id = styleId;
-            style.innerHTML = `
-                html, body, .stApp, [data-testid="stAppViewContainer"], 
-                [data-testid="stHeader"], header, [data-testid="stMain"], 
-                .main, section.main, .stMainBlockContainer, [data-testid="stAppViewBlockContainer"],
-                div[class*="stApp"], div[data-testid="stBottom"], div[class*="block-container"] {
-                    background: transparent !important;
-                    background-color: transparent !important;
-                }
-                body {
-                    background-color: #020408 !important;
-                }
-                #vyoma-local-bg-video {
-                    position: fixed !important;
-                    top: 0 !important;
-                    left: 0 !important;
-                    width: 100vw !important;
-                    height: 100vh !important;
-                    object-fit: cover !important;
-                    z-index: 1 !important;
-                    pointer-events: none !important;
-                    filter: brightness(0.68) contrast(1.10) !important;
-                    display: block !important;
-                    opacity: 1 !important;
-                    visibility: visible !important;
-                }
-                [data-testid="stMain"], [data-testid="stSidebar"] {
-                    position: relative !important;
-                    z-index: 10 !important;
-                }
-            `;
-            pDoc.head.appendChild(style);
-        }
-
-        // Hide YouTube background iframe if present
-        var ytIframe = pDoc.getElementById('vyoma-yt-bg-video');
-        if (ytIframe) ytIframe.style.display = 'none';
-
-        // Overlay Team Logo badge directly over the bottom-right Gemini star watermark
+        // Overlay Team Logo badge directly in bottom-right corner
         var badgeId = 'vyoma-lunar-flux-bottom-badge';
         var badge = pDoc.getElementById(badgeId);
         var logoB64 = "__TEAM_LOGO_B64__";
@@ -602,11 +533,11 @@ def inject_local_mp4_background_video():
             badge.id = badgeId;
             badge.style.cssText = `
                 position: fixed !important;
-                bottom: 50px !important;
-                right: 115px !important;
+                bottom: 30px !important;
+                right: 40px !important;
                 z-index: 999999 !important;
-                width: 80px !important;
-                height: 80px !important;
+                width: 85px !important;
+                height: 85px !important;
                 padding: 8px !important;
                 box-sizing: border-box !important;
                 display: flex !important;
@@ -616,7 +547,7 @@ def inject_local_mp4_background_video():
                 background: radial-gradient(circle, rgba(11, 16, 29, 0.98) 0%, rgba(3, 6, 13, 0.98) 100%) !important;
                 border: 2px solid #00A3FF !important;
                 border-radius: 14px !important;
-                box-shadow: 0 0 22px rgba(0, 163, 255, 0.85), 0 8px 30px rgba(0, 0, 0, 0.95) !important;
+                box-shadow: 0 0 25px rgba(0, 163, 255, 0.85), 0 8px 30px rgba(0, 0, 0, 0.95) !important;
                 backdrop-filter: blur(16px) !important;
                 -webkit-backdrop-filter: blur(16px) !important;
                 pointer-events: auto !important;
@@ -629,11 +560,84 @@ def inject_local_mp4_background_video():
             badge.style.display = 'flex';
         }
 
-        // Create or show Local Video background
-        var video = pDoc.getElementById('vyoma-local-bg-video');
-        if (!video) {
+        if (!pWin.THREE) {
+            var script = pDoc.createElement('script');
+            script.src = 'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js';
+            script.onload = startThree;
+            pDoc.head.appendChild(script);
+        } else {
+            startThree();
+        }
+    })();
+    </script>
+    """
+    js_code = js_code.replace("__NASA_MAP_B64__", NASA_MOON_MAP_B64).replace("__NASA_BUMP_B64__", NASA_MOON_BUMP_B64).replace("__TEAM_LOGO_B64__", TEAM_LOGO_B64)
+    components.html(js_code, height=0, width=0)
+
+def inject_local_mp4_background_video():
+    """
+    Safely injects background video and floating Team LUNAR FLUX logo badge 
+    behind the glassmorphic Streamlit UI without breaking DOM rendering.
+    """
+    js_code = """
+    <script>
+    (function() {
+        var pWin = window.parent || window;
+        var pDoc = pWin.document;
+
+        var styleId = 'vyoma-safe-bg-css';
+        if (!pDoc.getElementById(styleId)) {
+            var style = pDoc.createElement('style');
+            style.id = styleId;
+            style.innerHTML = `
+                html, body, .stApp {
+                    background-color: #020408 !important;
+                }
+                .stApp, [data-testid="stAppViewContainer"], [data-testid="stHeader"] {
+                    background: transparent !important;
+                    background-color: transparent !important;
+                }
+                #vyoma-bg-video {
+                    position: fixed !important;
+                    top: 0 !important;
+                    left: 0 !important;
+                    width: 100vw !important;
+                    height: 100vh !important;
+                    object-fit: cover !important;
+                    z-index: -1 !important;
+                    pointer-events: none !important;
+                    filter: brightness(0.70) contrast(1.10) !important;
+                }
+                #vyoma-lunar-flux-badge {
+                    position: fixed !important;
+                    bottom: 30px !important;
+                    right: 35px !important;
+                    z-index: 999999 !important;
+                    width: 80px !important;
+                    height: 80px !important;
+                    padding: 6px !important;
+                    box-sizing: border-box !important;
+                    display: flex !important;
+                    align-items: center !important;
+                    justify-content: center !important;
+                    background: radial-gradient(circle, rgba(11, 16, 29, 0.98) 0%, rgba(3, 6, 13, 0.98) 100%) !important;
+                    border: 2px solid #00A3FF !important;
+                    border-radius: 14px !important;
+                    box-shadow: 0 0 25px rgba(0, 163, 255, 0.85), 0 8px 30px rgba(0, 0, 0, 0.95) !important;
+                    backdrop-filter: blur(16px) !important;
+                    -webkit-backdrop-filter: blur(16px) !important;
+                }
+            `;
+            pDoc.head.appendChild(style);
+        }
+
+        // 1. Video Background Injection
+        var video = pDoc.getElementById('vyoma-bg-video');
+        var videoB64 = "__LOCAL_VIDEO_B64__";
+
+        if (!video && videoB64 && videoB64.length > 100) {
             video = pDoc.createElement('video');
-            video.id = 'vyoma-local-bg-video';
+            video.id = 'vyoma-bg-video';
             video.autoplay = true;
             video.loop = true;
             video.muted = true;
@@ -643,17 +647,24 @@ def inject_local_mp4_background_video():
             video.setAttribute('muted', '');
             video.setAttribute('autoplay', '');
             video.setAttribute('loop', '');
-            video.style.cssText = 'position: fixed !important; top: 0 !important; left: 0 !important; width: 100vw !important; height: 100vh !important; object-fit: cover !important; z-index: 1 !important; pointer-events: none !important; filter: brightness(0.68) contrast(1.10) !important; display: block !important; opacity: 1 !important; visibility: visible !important;';
-            
-            var videoSrc = "data:video/mp4;base64," + "__LOCAL_VIDEO_B64__";
-            video.src = videoSrc;
-            pDoc.body.appendChild(video);
-        } else {
-            video.style.display = 'block';
-            video.style.visibility = 'visible';
-            video.style.opacity = '1';
+            video.src = "data:video/mp4;base64," + videoB64;
+            pDoc.body.prepend(video);
         }
-        video.play().catch(function(e) {});
+
+        if (video) {
+            video.play().catch(function(e) {});
+        }
+
+        // 2. Team Logo Badge Injection
+        var badge = pDoc.getElementById('vyoma-lunar-flux-badge');
+        var logoB64 = "__TEAM_LOGO_B64__";
+
+        if (!badge && logoB64 && logoB64.length > 50) {
+            badge = pDoc.createElement('div');
+            badge.id = 'vyoma-lunar-flux-badge';
+            badge.innerHTML = '<img src="data:image/png;base64,' + logoB64 + '" style="width:100%;height:100%;object-fit:contain;" alt="Logo">';
+            pDoc.body.appendChild(badge);
+        }
     })();
     </script>
     """
@@ -728,7 +739,7 @@ def inject_youtube_background_video(video_id="pPuYfnaj_cc"):
     """
     components.html(js_code, height=0, width=0)
 
-# Always attach Gemini generated video as the primary background
+# Always attach Gemini generated video as the primary background & Team LUNAR FLUX badge
 inject_local_mp4_background_video()
 
 # Page Routing System using session state
