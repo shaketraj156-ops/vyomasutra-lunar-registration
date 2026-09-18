@@ -1,6 +1,6 @@
 # VyomaSutra
 
-## Multi-Sensor Lunar Image Registration
+## The Intelligent Multi-Sensor Lunar Image Registration
 
 VyomaSutra is an end-to-end image registration system for aligning lunar images captured by different sensors and at different resolutions.
 
@@ -9,7 +9,6 @@ The project is designed for Chandrayaan-2 sensor data, including:
 - OHRC: approximately 0.25 m resolution
 - TMC-2: approximately 5 m resolution
 - IIRS: approximately 80 m resolution
-- LROC reference imagery
 
 The system places images from different viewpoints, illumination conditions, and scales into a common reference frame. It produces an aligned, GIS-compatible GeoTIFF that can be inspected visually or used in later planetary-mapping workflows.
 
