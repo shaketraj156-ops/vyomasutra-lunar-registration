@@ -1,7 +1,7 @@
 # Python & Environment Caches
 __pycache__/
 *.pyc
-venv/
+.venv/
 .pytest_cache/
 .vscode/
 .idea/
