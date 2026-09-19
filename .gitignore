@@ -1,17 +1,12 @@
 # Python & Environment Caches
 __pycache__/
 *.pyc
-<<<<<<< Updated upstream
-=======
-venv/
->>>>>>> Stashed changes
 .venv/
 .pytest_cache/
 .vscode/
 .idea/
 
 # Ignore large MP4 videos, raw/processed data, and outputs
-data/*.mp4
 data/raw/
 data/processed/
 data/reference/
