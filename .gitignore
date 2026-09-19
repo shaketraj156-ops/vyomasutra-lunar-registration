@@ -1,6 +1,10 @@
 # Python & Environment Caches
 __pycache__/
 *.pyc
+<<<<<<< Updated upstream
+=======
+venv/
+>>>>>>> Stashed changes
 .venv/
 .pytest_cache/
 .vscode/

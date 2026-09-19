@@ -1,8 +1,9 @@
 """
-app.py — VyomaSutra: Lunar Image Registration Engine
-Streamlit application featuring an interactive, full-screen 3D revolving Moon
-background built with Three.js, floating glassmorphic UI, Dual Matching Engine,
-Sub-pixel Refinement, Multi-Metric Gatekeeper, and GIS GeoTIFF Export.
+streamlit_app.py
+VyomaSutra — Multi-Sensor Lunar Image Registration (SIH 2026 / PS 26166)
+Interactive Dashboard with Dual Matching, Sub-pixel Refinement,
+Checkerboard Alignment, Authentic GIS GeoTIFF Export, and an interactive
+full-screen 3D revolving Moon background.
 """
 
 import streamlit as st
