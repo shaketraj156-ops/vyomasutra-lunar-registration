@@ -597,6 +597,14 @@ def inject_local_mp4_background_video():
                     background: transparent !important;
                     background-color: transparent !important;
                 }
+                .stApp {
+                    position: relative !important;
+                    z-index: 1 !important;
+                }
+                [data-testid="stAppViewContainer"], [data-testid="stHeader"], [data-testid="stToolbar"] {
+                    position: relative !important;
+                    z-index: 2 !important;
+                }
                 #vyoma-bg-video {
                     position: fixed !important;
                     top: 0 !important;
@@ -604,7 +612,7 @@ def inject_local_mp4_background_video():
                     width: 100vw !important;
                     height: 100vh !important;
                     object-fit: cover !important;
-                    z-index: -1 !important;
+                    z-index: 0 !important;
                     pointer-events: none !important;
                     filter: brightness(0.70) contrast(1.10) !important;
                 }
@@ -643,10 +651,12 @@ def inject_local_mp4_background_video():
             video.muted = true;
             video.defaultMuted = true;
             video.playsInline = true;
+            video.preload = 'auto';
             video.setAttribute('playsinline', '');
             video.setAttribute('muted', '');
             video.setAttribute('autoplay', '');
             video.setAttribute('loop', '');
+            video.setAttribute('preload', 'auto');
             video.src = "data:video/mp4;base64," + videoB64;
             pDoc.body.prepend(video);
         }
